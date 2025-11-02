@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: checkout-repo
+      - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: setupJava
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           java-version: '21'
@@ -35,3 +35,9 @@ jobs:
 
       - name: Jacoco Report
         run: mvn jacoco:report
+
+      - name: Upload Jacoco Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/jacoco.xml
