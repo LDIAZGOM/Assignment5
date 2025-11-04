@@ -21,7 +21,6 @@ class BarnesAndNobleTest {
 
         assertNull(result);
     }
-
     @Test
     @DisplayName("specification-based: Should purchase full quantity when in stock")
     void testPurchaseQuantityInStock() {
