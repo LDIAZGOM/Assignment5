@@ -40,7 +40,6 @@ class AmazonIntegrationTest {
         // total = 70 + 5 + 7.5 = 82.5
         assertThat(result).isEqualTo(82.5);
     }
-
     @Test
     @DisplayName("structural-based: cartAdaptor stores items correctly in DB")
     void testCartAdaptorStoresItems() {
