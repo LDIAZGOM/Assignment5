@@ -2,14 +2,15 @@ package org.example.Barnes;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 class BarnesAndNobleTest {
+
     @Test
     @DisplayName("specification-based: Should return null when order is null")
     void testReturnNullWhenOrderIsNull() {
@@ -54,10 +55,12 @@ class BarnesAndNobleTest {
 
         PurchaseSummary summary = store.getPriceForCart(order);
 
+        // 2 books purchased, 3 unavailable
         assertEquals(20, summary.getTotalPrice());
         assertEquals(3, summary.getUnavailable().get(book));
         verify(buyProcess).buyBook(book, 2);
     }
+
     @Test
     @DisplayName("structural-based: Loop should handle multiple items")
     void testMultipleBooksInOrder() {
@@ -77,10 +80,11 @@ class BarnesAndNobleTest {
 
         PurchaseSummary summary = store.getPriceForCart(order);
 
-        assertEquals(15 * 2 + 20 * 1, summary.getTotalPrice());
+        assertEquals(50, summary.getTotalPrice());
         verify(buyProcess).buyBook(book1, 2);
         verify(buyProcess).buyBook(book2, 1);
     }
+
     @Test
     @DisplayName("structural-based: When quantity available equals requested, no unavailable quantity added")
     void testNoUnavailableWhenExactQuantity() {
@@ -101,5 +105,30 @@ class BarnesAndNobleTest {
         verify(buyProcess).buyBook(book, 4);
     }
 
+    @Test
+    @DisplayName("structural-based: Multiple unavailable books")
+    void testMultipleUnavailableBooks() {
+        BookDatabase db = mock(BookDatabase.class);
+        BuyBookProcess buyProcess = mock(BuyBookProcess.class);
 
+        Book book1 = new Book("X1", 5, 1);
+        Book book2 = new Book("X2", 10, 0);
+
+        when(db.findByISBN("X1")).thenReturn(book1);
+        when(db.findByISBN("X2")).thenReturn(book2);
+
+        BarnesAndNoble store = new BarnesAndNoble(db, buyProcess);
+        Map<String, Integer> order = new HashMap<>();
+        order.put("X1", 3);
+        order.put("X2", 2);
+
+        PurchaseSummary summary = store.getPriceForCart(order);
+
+        // totalPrice = 1*5 + 0*10 = 5
+        assertEquals(5, summary.getTotalPrice());
+        assertEquals(2, summary.getUnavailable().get(book1));
+        assertEquals(2, summary.getUnavailable().get(book2));
+        verify(buyProcess).buyBook(book1, 1);
+        verify(buyProcess).buyBook(book2, 0);
+    }
 }
